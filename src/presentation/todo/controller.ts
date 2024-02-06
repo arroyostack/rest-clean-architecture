@@ -28,8 +28,46 @@ export class TodoController {
     }
 
     public createTodo( req: Request, res: Response ) {
-        const body = req.body;
-        res.json( body );
+        const { text } = req.body;
+        if ( !text ) return res.status( 400 ).json( { error: "Text property is required" } );
+
+        const newTodo = {
+            id: Math.floor( Math.random() * Date.now() ),
+            text: text,
+            createdAt: new Date()
+        };
+
+        todos.push( newTodo );
+
+        res.json( newTodo );
+    }
+
+    public updateTodo( req: Request, res: Response ) {
+        const id = parseInt( req.params.id );
+        if ( isNaN( id ) ) return res.status( 404 ).json( { error: "Id property is must be a number." } );
+
+
+        const todo = todos.find( todo => todo.id === id );
+        if ( !todo ) return res.status( 400 ).json( { error: "Taks not found on database." } );
+        const { text } = req.body;
+
+        todo.text = text;
+
+        res.json( todo );
+
+    }
+
+    public deleteTodo( req: Request, res: Response ) {
+        const id = parseInt( req.params.id );
+        if ( isNaN( id ) ) return res.status( 404 ).json( { error: "Id property is must be a number." } );
+
+        const todo = todos.find( todo => todo.id === id );
+        if ( !todo ) return res.status( 400 ).json( { error: "Taks not found on database." } );
+
+        todos.filter( todo => todo.id !== id );
+
+        res.json( todos );
+
     }
 
 }
